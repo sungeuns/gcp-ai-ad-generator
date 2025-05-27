@@ -1,0 +1,38 @@
+# Git
+.git
+.gitignore
+
+# Node.js
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+*.egg-info/
+.DS_Store
+
+# IDE/Editor specific
+.vscode/
+.idea/
+*.swp
+*~
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# Build artifacts (if any outside the Docker context)
+build/
+dist/
+
+# Local environment files (should not be in Docker image)
+.env
+*.env.*
+!*.env.example

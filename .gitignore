@@ -1,0 +1,42 @@
+# Node / NPM
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+
+# Frontend build output
+frontend/build/
+frontend/coverage/
+
+# Python
+*__pycache__*
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+.env
+.venv/
+*venv*
+ENV/
+env/
+env.bak/
+venv.bak/
+backend/venv/
+
+# IDE / Editor specific
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
