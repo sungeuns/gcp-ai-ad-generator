@@ -48,15 +48,12 @@ project-alchemy-task3/
 
 ### Environment Variables
 
-Create a `.env` file in the `project-alchemy-task3/backend/` directory for local Vertex AI configuration:
+Create a `.env` file in the `project-alchemy-task3/backend/` directory for local Vertex AI configuration (check `backend/.env.example` file):
 
 ```env
 # project-alchemy-task3/backend/.env
 GCP_PROJECT_ID="your-gcp-project-id"
 GCP_REGION="your-gcp-region" # e.g., us-central1
-# GEMINI_MODEL_NAME="gemini-1.5-flash-001" # Optional: override default model
-# IMAGEN_MODEL_NAME="imagegeneration@006" # Optional: override default model
-# BRAND_NAME="Your Custom Brand" # Optional: override default brand name in prompts
 ```
 
 Replace placeholders with your actual GCP project ID and region.
@@ -102,43 +99,12 @@ Replace placeholders with your actual GCP project ID and region.
     -   Artifact Registry API
     -   Cloud Run API
     -   Vertex AI API
+    -   Cloud Logging API
 
 3.  **Run the deployment script (to be created):**
+
+- Check the `deploy_cloud_run.sh` file and change `DEFAULT_GCP_REGION` value.
+
     ```bash
-    bash scripts/deploy_cloud_run.sh YOUR_GCP_PROJECT_ID YOUR_GCP_REGION SERVICE_NAME
+    cd scripts; ./deploy_cloud_run.sh
     ```
-    Example:
-    ```bash
-    bash scripts/deploy_cloud_run.sh my-gcp-project us-central1 alchemy-ad-app
-    ```
-    This script will:
-    *   Build the Docker image using Cloud Build.
-    *   Push the image to Artifact Registry.
-    *   Deploy the image to Cloud Run.
-
-## API Endpoint
-
--   **`POST /api/v1/generate_ad_content`**
-    -   Request Body:
-        ```json
-        {
-            "customer_type": "positive"
-        }
-        ```
-        (or `"negative"`)
-    -   Response:
-        ```json
-        {
-            "ad_text": "Generated advertisement text...",
-            "ad_image_url": "URL_to_generated_image_or_placeholder"
-        }
-        ```
-
-## TODO / Future Enhancements
-
--   Implement actual image upload to GCS and serving via signed URLs from Imagen.
--   More sophisticated error handling and logging.
--   User authentication (if needed).
--   More detailed UI for ad display.
--   Unit and integration tests.
--   CI/CD pipeline for automated deployments.

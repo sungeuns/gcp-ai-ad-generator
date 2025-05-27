@@ -4,6 +4,7 @@ from vertexai.vision_models import ImageGenerationModel # Corrected import
 import os
 import base64 # Added for base64 encoding
 from dotenv import load_dotenv
+import google.cloud.logging # Import the logging library
 
 # Load environment variables from .env file for local development
 load_dotenv()
@@ -13,6 +14,14 @@ load_dotenv()
 # or can be set in the environment for local testing.
 PROJECT_ID = os.getenv("GCP_PROJECT_ID")
 LOCATION = os.getenv("GCP_REGION", "us-central1")
+
+# Initialize Google Cloud Logging client
+logging_client = google.cloud.logging.Client(project=PROJECT_ID)
+# The name of the log to write to
+# You can choose a name that makes sense for your application
+log_name = "gemini-imagen-prompts"
+# Selects the log to write to
+logger = logging_client.logger(log_name)
 
 if PROJECT_ID:
     vertexai.init(project=PROJECT_ID, location=LOCATION)
@@ -72,6 +81,8 @@ def generate_ad_text_with_gemini(prompt: str, num_variations: int = 1) -> list[s
     if not PROJECT_ID:
         return [f"Error: GCP_PROJECT_ID not configured. Cannot call Gemini for {num_variations} variations."]
     try:
+        # Log the prompt
+        logger.log_text(f"Gemini Prompt: {prompt}")
         model = GenerativeModel(GEMINI_MODEL_NAME)
         response = model.generate_content([prompt], generation_config=generation_config)
         
@@ -107,6 +118,8 @@ def generate_ad_image_with_imagen(prompt: str, aspect_ratio: str = "1:1", number
     
     image_data_list = []
     try:
+        # Log the prompt
+        logger.log_text(f"Imagen Prompt: {prompt}")
         model = ImageGenerationModel.from_pretrained(IMAGEN_MODEL_NAME)
         
         # Imagen's generate_images can take number_of_images directly
