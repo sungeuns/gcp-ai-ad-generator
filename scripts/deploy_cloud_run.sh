@@ -4,6 +4,15 @@ set -e
 # Change to the project root directory (parent of the script's directory)
 cd "$(dirname "$0")/.."
 
+# --- Check for backend/.env file ---
+ENV_FILE="backend/.env"
+if [ ! -f "$ENV_FILE" ]; then
+    echo "Error: Environment file '$ENV_FILE' not found."
+    echo "Please create it based on 'backend/.env.example' and populate it with your configuration."
+    exit 1
+fi
+echo "Using environment variables from $ENV_FILE"
+
 # Default values - can be overridden by command line arguments
 DEFAULT_GCP_PROJECT_ID=$(gcloud config get-value project)
 DEFAULT_GCP_REGION="us-central1" # Choose a region that supports your Vertex AI models
@@ -70,7 +79,8 @@ fi
 enable_api "run.googleapis.com"
 enable_api "artifactregistry.googleapis.com"
 enable_api "cloudbuild.googleapis.com"
-enable_api "aiplatform.googleapis.com" # For Vertex AI
+enable_api "logging.googleapis.com"
+enable_api "aiplatform.googleapis.com"
 
 # --- Create Artifact Registry Repository (if it doesn't exist) ---
 echo "Checking for Artifact Registry repository: $ARTIFACT_REGISTRY_REPO in $GCP_REGION..."
@@ -108,11 +118,8 @@ echo "Image built and pushed: ${IMAGE_NAME}:${IMAGE_TAG}"
 # --- Deploy to Cloud Run ---
 echo "Deploying to Cloud Run service: $SERVICE_NAME in $GCP_REGION..."
 
-# Environment variables for the Cloud Run service
-# These are the same as in backend/.env.example
-# You might want to manage secrets using Secret Manager for production
-RUN_ENV_VARS="GCP_PROJECT_ID=${GCP_PROJECT_ID},GCP_REGION=${GCP_REGION}"
-# Add other env vars like GEMINI_MODEL_NAME, IMAGEN_MODEL_NAME, BRAND_NAME if you want to override defaults
+# Environment variables will be loaded from the .env file copied into the Docker image.
+# No need to set them here via --set-env-vars.
 
 gcloud run deploy "$SERVICE_NAME" \
   --project="$GCP_PROJECT_ID" \
@@ -124,7 +131,6 @@ gcloud run deploy "$SERVICE_NAME" \
   --max-instances="$MAX_INSTANCES" \
   --allow-unauthenticated \
   --port=8080 \
-  --set-env-vars="${RUN_ENV_VARS}" \
   --timeout=300 # Adjust timeout as needed, esp. for AI model calls
   # --service-account=YOUR_SERVICE_ACCOUNT@YOUR_PROJECT_ID.iam.gserviceaccount.com # Recommended for production
 

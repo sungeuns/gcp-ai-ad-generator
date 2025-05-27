@@ -40,3 +40,6 @@ backend/venv/
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+backend/app/static/static/*
+

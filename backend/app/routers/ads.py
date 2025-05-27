@@ -21,9 +21,10 @@ async def generate_ad_content_api(request: AdGenerationRequest):
 
         # 1. Get Gemini prompt for multiple variations
         gemini_prompt_text = prompt_service.get_gemini_prompt(
-            request.customer_type,
+            # request.customer_type, # Removed
             request.product,
             request.product_description,
+            persona_description=request.persona_description, # Pass persona_description
             number_of_variations=num_to_generate
         )
 
@@ -42,10 +43,11 @@ async def generate_ad_content_api(request: AdGenerationRequest):
 
         # 3. Get Imagen prompt (it's the same prompt, Imagen service handles generating multiple images)
         imagen_prompt_text = prompt_service.get_imagen_prompt(
-            request.customer_type,
+            # request.customer_type, # Removed
             request.product,
             request.product_description,
-            number_of_variations=num_to_generate # Pass for consistency, though Imagen prompt itself might not change much
+            persona_description=request.persona_description, # Pass persona_description
+            number_of_variations=num_to_generate 
         )
 
         # 4. Generate ad images using Imagen
@@ -75,8 +77,8 @@ async def generate_ad_content_api(request: AdGenerationRequest):
         
         return AdGenerationResponse(creatives=creatives)
 
-    except ValueError as ve: # Catches errors from prompt_service if customer_type is invalid
-        raise HTTPException(status_code=400, detail=str(ve))
+    # except ValueError as ve: # customer_type is no longer validated here directly
+    #     raise HTTPException(status_code=400, detail=str(ve))
     except Exception as e:
         # Log the exception for debugging
         print(f"An unexpected error occurred: {e}")

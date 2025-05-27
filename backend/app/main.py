@@ -3,8 +3,15 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 import os
+from dotenv import load_dotenv
 
-from app.routers import ads
+# Load environment variables from .env file.
+# This will search for .env in the current working directory and then upwards.
+# - For local: CWD is 'backend/', .env is found at 'backend/.env'.
+# - For Docker: CWD is '/app', .env is found at '/app/.env'.
+load_dotenv()
+
+from app.routers import ads, persona
 
 app = FastAPI(title="Project Alchemy Task 3 API")
 
@@ -28,6 +35,7 @@ app.add_middleware(
 
 # API Routers
 app.include_router(ads.router, prefix="/api/v1", tags=["Advertisements"])
+app.include_router(persona.router, prefix="/api/v1", tags=["Persona"])
 
 # Serve static files (React build)
 # The 'directory' path is relative to where main.py is located.

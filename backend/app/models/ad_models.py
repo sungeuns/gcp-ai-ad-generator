@@ -1,15 +1,12 @@
 from pydantic import BaseModel, Field
-from enum import Enum
+# from enum import Enum # Enum is no longer needed
 from typing import List, Optional
 
-class CustomerType(str, Enum):
-    POSITIVE = "positive"
-    NEGATIVE = "negative"
-
 class AdGenerationRequest(BaseModel):
-    customer_type: CustomerType
+    # customer_type: CustomerType # Removed
     product: str
     product_description: str
+    persona_description: Optional[str] = Field(None, description="Detailed description of the target persona.")
     number_of_variations: Optional[int] = Field(default=1, description="Number of ad variations to generate. Frontend will send 3 if multiple are desired.")
 
 class AdCreative(BaseModel):

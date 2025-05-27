@@ -33,6 +33,11 @@ ENV PYTHONUNBUFFERED 1
 COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Copy the .env file for runtime configuration
+# Ensure backend/.env exists and is correctly populated.
+# It should be in .gitignore to avoid committing secrets.
+COPY backend/.env /app/.env
+
 # Copy the backend application code
 # This assumes your FastAPI app is in 'backend/app'
 COPY backend/app/ ./app/

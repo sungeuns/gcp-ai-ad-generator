@@ -31,8 +31,3 @@ Thumbs.db
 # Build artifacts (if any outside the Docker context)
 build/
 dist/
-
-# Local environment files (should not be in Docker image)
-.env
-*.env.*
-!*.env.example

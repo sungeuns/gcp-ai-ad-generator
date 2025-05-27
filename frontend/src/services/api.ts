@@ -5,9 +5,10 @@ import axios from 'axios';
 const API_BASE_URL = '/api/v1'; // Adjust if your FastAPI prefix is different
 
 export interface AdGenerationRequestPayload {
-  customer_type: 'positive' | 'negative';
+  // customer_type: 'positive' | 'negative'; // Removed
   product: string;
   product_description: string;
+  persona_description?: string; // Added to include the description of the selected persona
   number_of_variations?: number; // Added to specify how many ads to generate
 }
 
@@ -40,5 +41,28 @@ export const generateAdContent = async (payload: AdGenerationRequestPayload): Pr
       throw new Error(errorDetail);
     }
     throw new Error('Failed to generate ad content. An unknown error occurred.');
+  }
+};
+
+// Define a type for the persona segments API response
+export interface PersonaSegmentsResponse {
+  [key: string]: string[]; // A dictionary where keys are strings and values are arrays of strings
+}
+
+/**
+ * Calls the backend API to fetch persona segments.
+ * @returns A promise that resolves to the persona segments data.
+ */
+export const getPersonaSegments = async (): Promise<PersonaSegmentsResponse> => {
+  try {
+    const response = await axios.get<PersonaSegmentsResponse>(`${API_BASE_URL}/persona-segments`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching persona segments:', error);
+    if (axios.isAxiosError(error) && error.response) {
+      const errorDetail = error.response.data?.detail || 'Failed to fetch persona segments due to a server error.';
+      throw new Error(errorDetail);
+    }
+    throw new Error('Failed to fetch persona segments. An unknown error occurred.');
   }
 };

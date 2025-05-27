@@ -1,6 +1,7 @@
-fastapi
-uvicorn[standard]
-pydantic
-google-cloud-aiplatform
-python-dotenv
-google-cloud-logging
+fastapi==0.115.12
+uvicorn[standard]==0.34.2
+pydantic==2.11.4
+google-cloud-aiplatform==1.93.1
+google-cloud-bigquery==3.33.0
+python-dotenv==1.1.0
+google-cloud-logging==3.12.1
