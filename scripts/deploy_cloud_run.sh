@@ -110,8 +110,7 @@ gcloud builds submit . \
   --project="$GCP_PROJECT_ID" \
   --config="cloudbuild.yaml" \
   --substitutions="_IMAGE_NAME=${IMAGE_NAME},_IMAGE_TAG=${IMAGE_TAG}" \
-  --gcs-log-dir="gs://${GCP_PROJECT_ID}_cloudbuild/logs" \
-  --machine-type=e2-medium # Or another suitable machine type for your build
+  --gcs-log-dir="gs://${GCP_PROJECT_ID}_cloudbuild/logs"
 
 echo "Image built and pushed: ${IMAGE_NAME}:${IMAGE_TAG}"
 
