@@ -26,7 +26,7 @@ def get_gemini_prompt(product: str, product_description: str, persona_descriptio
     )
 
 def get_imagen_prompt(product: str, product_description: str, persona_description: Optional[str] = None, number_of_variations: int = 1) -> str: # Removed customer_type
-    return (
+    prompt = (
         f"Generate a high-quality advertisement image for the product: '{product}' "
         f"(Description: '{product_description}'). "
         f"{f'The image should visually resonate with the following persona: {persona_description}. ' if persona_description else 'The image should be generally appealing and highlight the product effectively. '}"
@@ -34,3 +34,9 @@ def get_imagen_prompt(product: str, product_description: str, persona_descriptio
         f"Style: Clean, modern, visually appealing. No text in image. "
         f"If generating multiple variations, ensure diversity in composition and perspective."
     )
+    
+    # Debug logging for Korean text issues
+    print(f"[DEBUG] Imagen prompt generated: {prompt}")
+    print(f"[DEBUG] Prompt contains Korean: {any(ord(char) >= 0xAC00 and ord(char) <= 0xD7A3 for char in prompt)}")
+    
+    return prompt
