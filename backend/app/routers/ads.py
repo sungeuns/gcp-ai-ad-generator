@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from app.models.ad_models import AdGenerationRequest, AdGenerationResponse, AdCreative # CustomerType is used by services
 from app.services import prompt_service, vertex_ai_service
+from app.services.translation_service import translate_product_info
 from typing import List
 
 router = APIRouter()
@@ -15,11 +16,26 @@ async def generate_ad_content_api(request: AdGenerationRequest):
     based on customer type, product, and product description.
     """
     try:
+        # Debug logging for Korean text issues
+        print(f"[DEBUG] Received request - Product: {request.product}")
+        print(f"[DEBUG] Product contains Korean: {any(ord(char) >= 0xAC00 and ord(char) <= 0xD7A3 for char in request.product)}")
+        print(f"[DEBUG] Product Description: {request.product_description}")
+        print(f"[DEBUG] Description contains Korean: {any(ord(char) >= 0xAC00 and ord(char) <= 0xD7A3 for char in request.product_description)}")
+        
         num_to_generate = request.number_of_variations if request.number_of_variations is not None else NUM_VARIATIONS
         if not (1 <= num_to_generate <= 4): # Imagen 3 supports up to 4, Gemini can do more but let's cap for consistency
             raise HTTPException(status_code=400, detail="Number of variations must be between 1 and 4.")
 
-        # 1. Get Gemini prompt for multiple variations
+        # Translate Korean product info to English for Imagen
+        product_for_imagen, description_for_imagen = translate_product_info(
+            request.product,
+            request.product_description
+        )
+        
+        print(f"[DEBUG] Original product: {request.product} -> Translated: {product_for_imagen}")
+        print(f"[DEBUG] Original description: {request.product_description} -> Translated: {description_for_imagen}")
+
+        # 1. Get Gemini prompt for multiple variations (use original Korean for text generation)
         gemini_prompt_text = prompt_service.get_gemini_prompt(
             # request.customer_type, # Removed
             request.product,
@@ -41,13 +57,13 @@ async def generate_ad_content_api(request: AdGenerationRequest):
                         error_detail += f" Text {i+1}: {text}"
             raise HTTPException(status_code=500, detail=error_detail)
 
-        # 3. Get Imagen prompt (it's the same prompt, Imagen service handles generating multiple images)
+        # 3. Get Imagen prompt using translated English text
         imagen_prompt_text = prompt_service.get_imagen_prompt(
             # request.customer_type, # Removed
-            request.product,
-            request.product_description,
+            product_for_imagen,  # Use translated product name
+            description_for_imagen,  # Use translated description
             persona_description=request.persona_description, # Pass persona_description
-            number_of_variations=num_to_generate 
+            number_of_variations=num_to_generate
         )
 
         # 4. Generate ad images using Imagen

@@ -31,6 +31,12 @@ export const generateAdContent = async (payload: AdGenerationRequestPayload): Pr
     // Ensure number_of_variations is included in the payload sent to the backend.
     // The backend will default if not provided, but explicit is better.
     const requestPayload = { ...payload, number_of_variations: payload.number_of_variations || 3 };
+    
+    // Debug logging for Korean text issues
+    console.log('[DEBUG] Sending request with payload:', requestPayload);
+    console.log('[DEBUG] Product contains Korean:', /[\u3131-\uD79D]/.test(requestPayload.product));
+    console.log('[DEBUG] Description contains Korean:', /[\u3131-\uD79D]/.test(requestPayload.product_description));
+    
     const response = await axios.post<AdGenerationResponseData>(`${API_BASE_URL}/generate_ad_content`, requestPayload);
     return response.data;
   } catch (error) {

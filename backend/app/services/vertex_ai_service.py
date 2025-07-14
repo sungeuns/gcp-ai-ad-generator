@@ -81,8 +81,12 @@ def generate_ad_text_with_gemini(prompt: str, num_variations: int = 1) -> list[s
     if not PROJECT_ID:
         return [f"Error: GCP_PROJECT_ID not configured. Cannot call Gemini for {num_variations} variations."]
     try:
-        # Log the prompt
-        logger.log_text(f"Gemini Prompt: {prompt}")
+        # Enhanced logging for debugging Korean text issues
+        logger.log_text(f"[DEBUG] Gemini Prompt: {prompt}")
+        logger.log_text(f"[DEBUG] Prompt contains Korean: {any(ord(char) >= 0xAC00 and ord(char) <= 0xD7A3 for char in prompt)}")
+        
+        import json
+        logger.log_text(f"[DEBUG] Prompt as JSON: {json.dumps(prompt, ensure_ascii=False)}")
         model = GenerativeModel(GEMINI_MODEL_NAME)
         response = model.generate_content([prompt], generation_config=generation_config)
         
@@ -118,8 +122,15 @@ def generate_ad_image_with_imagen(prompt: str, aspect_ratio: str = "1:1", number
     
     image_data_list = []
     try:
-        # Log the prompt
-        logger.log_text(f"Imagen Prompt: {prompt}")
+        # Enhanced logging for debugging Korean text issues
+        logger.log_text(f"[DEBUG] Imagen Prompt: {prompt}")
+        logger.log_text(f"[DEBUG] Prompt contains Korean: {any(ord(char) >= 0xAC00 and ord(char) <= 0xD7A3 for char in prompt)}")
+        logger.log_text(f"[DEBUG] Prompt length: {len(prompt)} characters")
+        
+        # Log the prompt in both original and encoded form
+        import json
+        logger.log_text(f"[DEBUG] Prompt as JSON: {json.dumps(prompt, ensure_ascii=False)}")
+        logger.log_text(f"[DEBUG] Prompt bytes: {prompt.encode('utf-8')}")
         model = ImageGenerationModel.from_pretrained(IMAGEN_MODEL_NAME)
         
         # Imagen's generate_images can take number_of_images directly
